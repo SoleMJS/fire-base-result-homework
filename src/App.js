@@ -14,9 +14,9 @@ function App() {
 		<div className='container mt-4'>
 			<h1>Todo List</h1>
 			<ul className='list-group'>
-				{todos.map(todo => (
-					<li key={todo.id} className='list-group-item'>
-						{todo.title}
+				{todos.map(({ id, title }) => (
+					<li key={id} className='list-group-item'>
+						{title}
 					</li>
 				))}
 			</ul>
