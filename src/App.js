@@ -1,21 +1,18 @@
-import { useState } from 'react'
+// App.js
+import React, { useEffect, useState } from 'react'
+import { Provider, useDispatch, useSelector } from 'react-redux'
 import './App.css'
 import {
-	useRequestAddTodo,
-	useRequestDeleteTodo,
-	useRequestGetTodo,
-	useRequestUpdateTodo,
-} from './hooks'
+	requestAddTodo,
+	requestDeleteTodo,
+	requestGetTodo,
+	requestUpdateTodo,
+} from './actions'
+import store from './store'
 
-function App() {
-	const [refreshTodosFlag, setRefreshTodosFlag] = useState(false)
-
-	const refreshTodos = () => setRefreshTodosFlag(!refreshTodosFlag)
-
-	const { isLoading, todos } = useRequestGetTodo()
-	const { isCreating, requestAddTodo } = useRequestAddTodo(refreshTodos)
-	const { isUpdating, requestUpdateTodo } = useRequestUpdateTodo(refreshTodos)
-	const { isDeleting, requestDeleteTodo } = useRequestDeleteTodo(refreshTodos)
+const App = () => {
+	const dispatch = useDispatch()
+	const { todos, isLoading } = useSelector(state => state)
 
 	const [searchTerm, setSearchTerm] = useState('')
 	const [sortBy, setSortBy] = useState('')
@@ -32,6 +29,10 @@ function App() {
 		}
 		return 0
 	})
+
+	useEffect(() => {
+		dispatch(requestGetTodo())
+	}, [dispatch])
 
 	return (
 		<div className='container mt-4'>
@@ -75,23 +76,23 @@ function App() {
 					</ul>
 
 					<button
-						disabled={isCreating}
+						disabled={isLoading}
 						className='btn btn-primary m-2'
-						onClick={requestAddTodo}
+						onClick={() => dispatch(requestAddTodo())}
 					>
 						Добавить задачу
 					</button>
 					<button
 						className='btn btn-primary m-2'
-						disabled={isUpdating}
-						onClick={requestUpdateTodo}
+						disabled={isLoading}
+						onClick={() => dispatch(requestUpdateTodo())}
 					>
 						Обновить задачу
 					</button>
 					<button
 						className='btn btn-danger m-2'
-						disabled={isDeleting}
-						onClick={requestDeleteTodo}
+						disabled={isLoading}
+						onClick={() => dispatch(requestDeleteTodo())}
 					>
 						Удалить задачу
 					</button>
@@ -101,4 +102,12 @@ function App() {
 	)
 }
 
-export default App
+const AppWrapper = () => {
+	return (
+		<Provider store={store}>
+			<App />
+		</Provider>
+	)
+}
+
+export default AppWrapper
